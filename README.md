@@ -1,121 +1,192 @@
+<div align="center">
+
 # Parla
 
-A free, open-source, **model-agnostic** push-to-talk dictation app for macOS.
-Hold a key, speak, and the transcribed text is typed at your cursor in any app.
+**Free, open-source, model-agnostic push-to-talk dictation for macOS.**
 
-Speech never has to leave your Mac: point Parla at a local Whisper server (or
-the built-in whisper.cpp engine, coming soon) and nothing is uploaded anywhere.
-Or point it at any OpenAI-compatible endpoint — your choice.
+Hold a key, speak, and your words are typed at the cursor in whatever app you're in.
+Transcription runs on your Mac by default — nothing is uploaded.
 
-> Working name. MIT-licensed. macOS 13+, Apple Silicon.
+`macOS 13+` · `Apple Silicon` · `Swift` · `MIT`
+
+</div>
+
+---
 
 ## Why
 
-Most good dictation apps are closed and lock you into one transcription engine.
-Parla does the opposite: transcription is a swappable backend, so you can run
-**any model you like** — local or remote.
+Most good dictation apps are closed and lock you into a single transcription
+engine. Parla does the opposite: **transcription is a swappable backend**, so
+you can run whatever model you like — Apple's on-device model, a local
+whisper.cpp model, or any remote/local OpenAI-compatible server.
+
+It's free, it's open, and by default your audio never leaves the machine.
+
+## Features
+
+- 🎙️ **Push-to-talk** — hold a key, speak, release. Or press-to-toggle.
+- ⌨️ **Types at your cursor** in any app, without clobbering your clipboard.
+- 🔀 **Three transcription backends**, switchable in Settings (see below).
+- 🔒 **Local by default** — audio stays on your Mac; no telemetry.
+- 🪶 **Lightweight menu-bar app** — no Dock icon, no window in your face.
+- 🧩 **Hackable** — add a new engine in ~30 lines behind one protocol.
+
+## Transcription backends
+
+| Backend | Setup | Runs on | Notes |
+|---|---|---|---|
+| **Apple on-device** *(default)* | none | your Mac | macOS 26+. System manages language assets automatically. |
+| **Built-in whisper.cpp** | download a model in-app | your Mac's GPU (Metal) | Works offline. Whisper tiny → large-v3-turbo. |
+| **OpenAI-compatible** | enter an endpoint URL | wherever you point it | OpenAI, Groq, LM Studio, llama.cpp server, faster-whisper-server, … |
+
+All three are selected from **Settings → Transcription**. The audio never
+leaves your Mac for the two local options; with the OpenAI-compatible option it
+goes only to the server you choose.
+
+## Install & build
+
+Requirements: **Xcode** (for the macOS SDK + Metal), **CMake**, and **Swift 5.9+**.
+
+```sh
+git clone <your-fork-url> parla
+cd parla
+make run          # build everything, assemble Parla.app, launch it
+```
+
+Other targets:
+
+```sh
+make app          # build the release .app bundle (no launch)
+make debug        # fast debug bundle
+make clean        # remove build artifacts
+```
+
+The first build runs `scripts/build-whisper.sh`, which fetches whisper.cpp (a
+pinned release) and compiles it into static libraries with the **Metal backend
+embedded** — so the finished app is a single self-contained binary with no
+runtime dependencies. Always build via `make`, not bare `swift build`, so those
+libraries exist first.
+
+> **Note on signing.** Builds are ad-hoc signed for local use. To share the app
+> with others you'll need a Developer ID signature + notarization, otherwise
+> Gatekeeper will block it on other Macs.
+
+## Usage
+
+1. Launch Parla — a 🎙️ icon appears in the menu bar.
+2. Grant the three permissions (see below) and relaunch.
+3. **Hold right ⌥**, speak, release. The transcript is typed at your cursor.
+
+Open **Settings** from the menu-bar icon to change the trigger key, pick a
+backend, set the language, or switch the insert method.
+
+### Permissions
+
+macOS will prompt for these the first time they're needed; you can also manage
+them in **System Settings → Privacy & Security**, and re-check them from Parla's
+Settings window.
+
+| Permission | Why |
+|---|---|
+| **Microphone** | to capture your voice |
+| **Accessibility** | to type the text at your cursor |
+| **Input Monitoring** | to detect the dictation key being held |
+
+## Configuration
+
+Everything is in the Settings window:
+
+- **Trigger** — right ⌥ / ⌘ / ⌃, or fn. Hold-to-talk or press-to-toggle.
+- **Backend** — Apple on-device, built-in whisper.cpp, or OpenAI-compatible.
+  - *whisper.cpp:* download/select/delete models in-app.
+  - *OpenAI-compatible:* endpoint (`…/v1`), optional API key, model name.
+- **Language** — ISO code (e.g. `en`, `de`) or empty for auto-detect.
+- **Output** — type directly (keeps clipboard) or paste via ⌘V.
+
+### Using a remote or custom model
+
+Point the OpenAI-compatible backend at any server speaking
+`POST {endpoint}/audio/transcriptions` — for example a local
+[`faster-whisper-server`](https://github.com/fedirz/faster-whisper-server),
+`whisper.cpp`'s `whisper-server`, Groq, or OpenAI:
+
+- **Endpoint:** `http://127.0.0.1:8080/v1` (whatever your server uses)
+- **Model:** the model name your server expects
+- **API key:** only if the server/provider requires one
 
 ## How it works
 
-Five small pieces:
+Five small pieces wired together by `DictationController`:
 
-1. **Hotkey** — a `CGEventTap` detects your trigger key (default: hold right ⌥).
-   Push-to-talk, or press-to-toggle. *(Needs Input Monitoring permission.)*
-2. **Audio** — `AVAudioEngine` captures the mic and resamples to 16 kHz mono.
-   *(Needs Microphone permission.)*
-3. **Transcription** — a `TranscriptionProvider` turns samples into text:
-   - **Apple on-device** (macOS 26+) — Apple's built-in speech model via
-     `SpeechAnalyzer`/`SpeechTranscriber`. Zero setup: the system manages the
-     language assets and runs everything on-device. *(Default.)*
-   - **Built-in whisper.cpp** — fully offline, on-device transcription on the
-     GPU (Metal). Models download from inside the app. Audio never leaves the Mac.
-   - **OpenAI-compatible** (`POST {endpoint}/audio/transcriptions`) — works with
-     OpenAI, Groq, LM Studio, llama.cpp server, faster-whisper-server, …
-4. **Insert** — types the text at your cursor via synthetic key events, without
-   clobbering your clipboard (or via ⌘V paste). *(Needs Accessibility permission.)*
-5. **UI** — a menu-bar item, a floating "listening" pill, and a settings window.
+1. **Hotkey** — a `CGEventTap` detects the trigger key *(Input Monitoring)*.
+2. **Audio** — `AVAudioEngine` captures the mic, resampled to 16 kHz mono *(Microphone)*.
+3. **Transcription** — a `TranscriptionProvider` turns samples into text.
+4. **Insert** — synthetic key events type the text at the cursor *(Accessibility)*.
+5. **UI** — menu-bar item, floating "listening" pill, SwiftUI settings.
 
-## Build & run
+The whole point is step 3: anything model-specific lives behind the
+`TranscriptionProvider` protocol, so the rest of the app never cares which
+engine runs.
 
-Requires Xcode (for Metal + the macOS SDK), CMake, and Swift 5.9+.
-
-```sh
-make run        # build whisper.cpp + release, assemble Parla.app, launch it
-make app        # build the .app bundle
-make debug      # fast debug bundle
+```swift
+protocol TranscriptionProvider {
+    func transcribe(samples: [Float], language: String?) async throws -> String
+}
 ```
 
-The first build runs `scripts/build-whisper.sh`, which clones whisper.cpp
-(pinned tag) and compiles it into static libraries with the Metal backend
-embedded — so the final app is a single self-contained binary with no runtime
-dependencies. Use `make` (not bare `swift build`), so those libs exist first.
-
-### Default transcription (zero setup, macOS 26+)
-
-Out of the box Parla uses **Apple's on-device speech model**. The first time
-you dictate in a language, the system downloads its assets automatically; after
-that it runs fully on-device.
-
-Prefer whisper.cpp? Settings → Transcription → **Built-in whisper.cpp**,
-download a model (`base.en` for English, `base`/`small` otherwise). Everything
-runs on your Mac's GPU; nothing is uploaded.
-
-On first launch, grant the three permissions in **System Settings → Privacy &
-Security** (Microphone, Accessibility, Input Monitoring), then re-launch. The
-settings window has a "Grant" button and a re-check for each.
-
-## Using any other model (OpenAI-compatible)
-
-Prefer a remote model, or a server you already run? Point Parla at any
-OpenAI-compatible endpoint — e.g.
-[`faster-whisper-server`](https://github.com/fedirz/faster-whisper-server),
-`whisper.cpp`'s `whisper-server`, Groq, or OpenAI — in settings:
-
-- **Backend**: OpenAI-compatible server
-- **Endpoint**: `http://127.0.0.1:8080/v1` (whatever your server uses)
-- **Model**: the model name your server expects
-- **API key**: only if your server/provider needs one
-
-Hold right ⌥, speak, release — the text lands at your cursor.
-
-## Roadmap
-
-- [x] Apple on-device provider (SpeechAnalyzer/SpeechTranscriber, macOS 26+)
-- [x] Built-in whisper.cpp provider (bundled Metal engine, on-device models)
-- [x] One-click model download (Whisper tiny → large-v3-turbo)
-- [x] OpenAI-compatible provider (any remote/local server)
-- [ ] Optional local LLM cleanup pass (punctuation, filler removal)
-- [ ] Move API key to the Keychain
-- [ ] Personal dictionary / text snippets
-- [ ] Developer ID signing + notarization for distribution
-- [ ] Linux port
-
-## Project layout
+### Project layout
 
 ```
 Sources/Parla/
-  main.swift                 entry point (+ hidden --selftest)
+  main.swift                 entry point (+ hidden --selftest modes)
   Core/      AppDelegate, DictationController, Settings, ModelManager
-  Audio/     AudioRecorder          (mic → 16 kHz mono Float32)
-  Hotkey/    HotkeyMonitor          (CGEventTap push-to-talk)
+  Audio/     AudioRecorder          mic → 16 kHz mono Float32
+  Hotkey/    HotkeyMonitor          CGEventTap push-to-talk
   Transcribe/ TranscriptionProvider (protocol)
-             AppleSpeechProvider, LocalWhisperProvider + WhisperEngine,
-             OpenAICompatibleProvider
-  Insert/    TextInserter           (type at cursor / paste)
+             AppleSpeechProvider          Apple on-device (macOS 26+)
+             LocalWhisperProvider + WhisperEngine   whisper.cpp (Metal)
+             OpenAICompatibleProvider     any HTTP server
+  Insert/    TextInserter           type at cursor / paste
   UI/        PillWindow, SettingsView
 Sources/CWhisper/            module map exposing whisper.cpp to Swift
 scripts/build-whisper.sh     fetches + builds whisper.cpp (Metal, static)
 scripts/bundle.sh            assembles + ad-hoc signs Parla.app
 ```
 
-### Verify the engine
+### Verifying the engines
+
+Hidden developer self-tests run a backend on a 16 kHz mono WAV and print the
+transcript — no mic or accessibility prompts needed:
 
 ```sh
-.build/release/Parla --selftest <model.bin> <audio.wav>
+.build/release/Parla --selftest <model.bin> <audio.wav>   # whisper.cpp
+.build/release/Parla --selftest-apple <audio.wav>         # Apple on-device
 ```
-Runs the linked whisper.cpp on a 16 kHz mono WAV and prints the transcript —
-handy for checking the engine without microphone/accessibility prompts.
+
+## Roadmap
+
+- [x] Apple on-device provider (SpeechAnalyzer / SpeechTranscriber, macOS 26+)
+- [x] Built-in whisper.cpp provider (embedded Metal engine, on-device models)
+- [x] In-app model download (Whisper tiny → large-v3-turbo)
+- [x] OpenAI-compatible provider (any remote/local server)
+- [ ] Optional LLM cleanup pass (punctuation, filler removal)
+- [ ] Move API key to the Keychain
+- [ ] Personal dictionary / text snippets
+- [ ] Developer ID signing + notarization for distribution
+- [ ] Linux port
+
+## Contributing
+
+Issues and PRs welcome. A new transcription backend is the easiest place to
+start: implement `TranscriptionProvider`, add a case to `ProviderKind`, and wire
+it into `DictationController.provider()`.
+
+## Acknowledgements
+
+- [whisper.cpp](https://github.com/ggml-org/whisper.cpp) by Georgi Gerganov and
+  contributors — the embedded offline engine.
+- Apple's Speech framework (`SpeechAnalyzer` / `SpeechTranscriber`).
 
 ## License
 
-MIT — see [LICENSE](LICENSE).
+[MIT](LICENSE).
