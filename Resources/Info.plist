@@ -29,5 +29,7 @@
     <true/>
     <key>NSMicrophoneUsageDescription</key>
     <string>Parla listens only while you hold the dictation key. Audio is transcribed on your Mac (or your chosen server) and never sent anywhere else.</string>
+    <key>NSSpeechRecognitionUsageDescription</key>
+    <string>Parla uses the built-in on-device speech model to turn your dictation into text. Audio stays on your Mac.</string>
 </dict>
 </plist>

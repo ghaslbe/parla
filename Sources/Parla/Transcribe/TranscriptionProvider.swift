@@ -24,6 +24,14 @@ protocol TranscriptionProvider {
     func transcribe(samples: [Float], language: String?) async throws -> String
 }
 
+/// Returned when a selected provider is not usable (e.g. OS too old).
+struct UnavailableProvider: TranscriptionProvider {
+    let reason: String
+    func transcribe(samples: [Float], language: String?) async throws -> String {
+        throw TranscriptionError.notConfigured(reason)
+    }
+}
+
 enum WAV {
     /// Encode 16 kHz mono Float32 samples as a 16-bit PCM WAV file in memory.
     static func encode(samples: [Float], sampleRate: Int = 16_000) -> Data {

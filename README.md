@@ -24,6 +24,9 @@ Five small pieces:
 2. **Audio** — `AVAudioEngine` captures the mic and resamples to 16 kHz mono.
    *(Needs Microphone permission.)*
 3. **Transcription** — a `TranscriptionProvider` turns samples into text:
+   - **Apple on-device** (macOS 26+) — Apple's built-in speech model via
+     `SpeechAnalyzer`/`SpeechTranscriber`. Zero setup: the system manages the
+     language assets and runs everything on-device. *(Default.)*
    - **Built-in whisper.cpp** — fully offline, on-device transcription on the
      GPU (Metal). Models download from inside the app. Audio never leaves the Mac.
    - **OpenAI-compatible** (`POST {endpoint}/audio/transcriptions`) — works with
@@ -47,11 +50,15 @@ The first build runs `scripts/build-whisper.sh`, which clones whisper.cpp
 embedded — so the final app is a single self-contained binary with no runtime
 dependencies. Use `make` (not bare `swift build`), so those libs exist first.
 
-### Default (offline) transcription
+### Default transcription (zero setup, macOS 26+)
 
-Open Settings → Transcription → **Built-in whisper.cpp**, download a model
-(start with `base.en` for English or `base`/`small` for other languages), and
-you are done. Everything runs on your Mac's GPU; nothing is uploaded.
+Out of the box Parla uses **Apple's on-device speech model**. The first time
+you dictate in a language, the system downloads its assets automatically; after
+that it runs fully on-device.
+
+Prefer whisper.cpp? Settings → Transcription → **Built-in whisper.cpp**,
+download a model (`base.en` for English, `base`/`small` otherwise). Everything
+runs on your Mac's GPU; nothing is uploaded.
 
 On first launch, grant the three permissions in **System Settings → Privacy &
 Security** (Microphone, Accessibility, Input Monitoring), then re-launch. The
@@ -73,6 +80,7 @@ Hold right ⌥, speak, release — the text lands at your cursor.
 
 ## Roadmap
 
+- [x] Apple on-device provider (SpeechAnalyzer/SpeechTranscriber, macOS 26+)
 - [x] Built-in whisper.cpp provider (bundled Metal engine, on-device models)
 - [x] One-click model download (Whisper tiny → large-v3-turbo)
 - [x] OpenAI-compatible provider (any remote/local server)
@@ -91,7 +99,8 @@ Sources/Parla/
   Audio/     AudioRecorder          (mic → 16 kHz mono Float32)
   Hotkey/    HotkeyMonitor          (CGEventTap push-to-talk)
   Transcribe/ TranscriptionProvider (protocol)
-             OpenAICompatibleProvider, LocalWhisperProvider, WhisperEngine
+             AppleSpeechProvider, LocalWhisperProvider + WhisperEngine,
+             OpenAICompatibleProvider
   Insert/    TextInserter           (type at cursor / paste)
   UI/        PillWindow, SettingsView
 Sources/CWhisper/            module map exposing whisper.cpp to Swift

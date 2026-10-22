@@ -63,10 +63,13 @@ final class DictationController {
     private func provider() -> TranscriptionProvider {
         let s = AppSettings.shared
         switch s.provider {
-        case .openAICompatible:
-            return OpenAICompatibleProvider(baseURL: s.endpoint, apiKey: s.apiKey, model: s.model)
+        case .appleSpeech:
+            if #available(macOS 26.0, *) { return AppleSpeechProvider() }
+            return UnavailableProvider(reason: "Apple on-device speech needs macOS 26 or later")
         case .localWhisper:
             return LocalWhisperProvider(modelPath: s.localModelPath)
+        case .openAICompatible:
+            return OpenAICompatibleProvider(baseURL: s.endpoint, apiKey: s.apiKey, model: s.model)
         }
     }
 

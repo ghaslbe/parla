@@ -33,12 +33,16 @@ struct SettingsView: View {
                 Picker("Backend", selection: $provider) {
                     ForEach(ProviderKind.allCases) { Text($0.label).tag($0) }
                 }
-                if provider == .openAICompatible {
+                switch provider {
+                case .appleSpeech:
+                    Text("Uses Apple's built-in on-device speech model. The system downloads the language assets automatically on first use. Requires macOS 26+.")
+                        .font(.caption).foregroundStyle(.secondary)
+                case .localWhisper:
+                    localModelsView
+                case .openAICompatible:
                     TextField("Endpoint (…/v1)", text: $endpoint)
                     SecureField("API key (optional)", text: $apiKey)
                     TextField("Model", text: $model)
-                } else {
-                    localModelsView
                 }
                 TextField("Language (ISO code, empty = auto)", text: $language)
             }

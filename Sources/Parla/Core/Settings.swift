@@ -33,14 +33,16 @@ enum InsertMethod: String, CaseIterable, Identifiable {
 }
 
 enum ProviderKind: String, CaseIterable, Identifiable {
-    case openAICompatible
+    case appleSpeech
     case localWhisper
+    case openAICompatible
 
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .openAICompatible: return "OpenAI-compatible server"
+        case .appleSpeech:      return "Apple on-device (macOS 26+)"
         case .localWhisper:     return "Local whisper.cpp (built-in)"
+        case .openAICompatible: return "OpenAI-compatible server"
         }
     }
 }
@@ -69,7 +71,7 @@ final class AppSettings {
             K.trigger: TriggerKey.rightOption.rawValue,
             K.holdToTalk: true,
             K.insertMethod: InsertMethod.unicode.rawValue,
-            K.provider: ProviderKind.openAICompatible.rawValue,
+            K.provider: ProviderKind.appleSpeech.rawValue,
             K.endpoint: "http://127.0.0.1:8080/v1",
             K.apiKey: "",
             K.model: "whisper-1",

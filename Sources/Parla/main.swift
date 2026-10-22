@@ -24,6 +24,33 @@ if CommandLine.arguments.contains("--selftest") {
     }
 }
 
+// Hidden self-test for Apple's on-device model: `Parla --selftest-apple <wav>`.
+if CommandLine.arguments.contains("--selftest-apple") {
+    let args = CommandLine.arguments
+    guard let i = args.firstIndex(of: "--selftest-apple"), args.count > i + 1 else {
+        fputs("usage: Parla --selftest-apple <audio.wav>\n", stderr); exit(2)
+    }
+    guard #available(macOS 26.0, *) else { fputs("needs macOS 26+\n", stderr); exit(1) }
+    do {
+        let samples = try decodeWav16kMono(path: args[i + 1])
+        fputs("selftest-apple: \(samples.count) samples\n", stderr)
+        let sem = DispatchSemaphore(value: 0)
+        var outcome: Result<String, Error>!
+        Task {
+            do { outcome = .success(try await AppleSpeechProvider().transcribe(samples: samples, language: "en")) }
+            catch { outcome = .failure(error) }
+            sem.signal()
+        }
+        sem.wait()
+        switch outcome! {
+        case .success(let t): print(t); exit(0)
+        case .failure(let e): fputs("selftest-apple failed: \(e)\n", stderr); exit(1)
+        }
+    } catch {
+        fputs("selftest-apple failed: \(error)\n", stderr); exit(1)
+    }
+}
+
 let app = NSApplication.shared
 let delegate = AppDelegate()
 app.delegate = delegate
