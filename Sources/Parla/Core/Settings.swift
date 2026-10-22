@@ -11,10 +11,10 @@ enum TriggerKey: Int, CaseIterable, Identifiable {
 
     var label: String {
         switch self {
-        case .rightOption:  return "Right ⌥ Option"
-        case .rightCommand: return "Right ⌘ Command"
-        case .rightControl: return "Right ⌃ Control"
-        case .fn:           return "fn / 🌐 Globe"
+        case .rightOption:  return L("Right ⌥ Option")
+        case .rightCommand: return L("Right ⌘ Command")
+        case .rightControl: return L("Right ⌃ Control")
+        case .fn:           return L("fn / 🌐 Globe")
         }
     }
 }
@@ -26,8 +26,8 @@ enum InsertMethod: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .unicode: return "Type directly (keeps clipboard)"
-        case .paste:   return "Paste via ⌘V"
+        case .unicode: return L("Type directly (keeps clipboard)")
+        case .paste:   return L("Paste via ⌘V")
         }
     }
 }
@@ -40,9 +40,9 @@ enum ProviderKind: String, CaseIterable, Identifiable {
     var id: String { rawValue }
     var label: String {
         switch self {
-        case .appleSpeech:      return "Apple on-device (macOS 26+)"
-        case .localWhisper:     return "Local whisper.cpp (built-in)"
-        case .openAICompatible: return "OpenAI-compatible server"
+        case .appleSpeech:      return L("Apple on-device (macOS 26+)")
+        case .localWhisper:     return L("Local whisper.cpp (built-in)")
+        case .openAICompatible: return L("OpenAI-compatible server")
         }
     }
 }

@@ -83,7 +83,7 @@ struct SettingsView: View {
 
         if let dl = models.downloading {
             VStack(alignment: .leading, spacing: 4) {
-                Text("Downloading \(dl)…").font(.caption)
+                Text("\(L("Downloading")) \(dl)…").font(.caption)
                 ProgressView(value: models.progress)
             }
         }
@@ -113,7 +113,7 @@ struct SettingsView: View {
         }
     }
 
-    private func permissionRow(_ title: String, _ ok: Bool, action: @escaping () -> Void) -> some View {
+    private func permissionRow(_ title: LocalizedStringKey, _ ok: Bool, action: @escaping () -> Void) -> some View {
         HStack {
             Image(systemName: ok ? "checkmark.circle.fill" : "exclamationmark.circle")
                 .foregroundStyle(ok ? .green : .orange)
@@ -153,7 +153,7 @@ final class SettingsWindowController {
         }
         let hosting = NSHostingController(rootView: SettingsView())
         let win = NSWindow(contentViewController: hosting)
-        win.title = "Parla Settings"
+        win.title = L("Parla Settings")
         win.styleMask = [.titled, .closable, .miniaturizable]
         win.isReleasedWhenClosed = false
         win.center()

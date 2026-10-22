@@ -1,0 +1,49 @@
+/* Trigger section */
+"Trigger" = "Auslöser";
+"Key" = "Taste";
+"Hold to talk (off = press to toggle)" = "Zum Sprechen halten (aus = Umschalten per Tastendruck)";
+"Right ⌥ Option" = "Rechte ⌥ Wahltaste";
+"Right ⌘ Command" = "Rechte ⌘ Befehlstaste";
+"Right ⌃ Control" = "Rechte ⌃ Control-Taste";
+"fn / 🌐 Globe" = "fn / 🌐 Globus";
+
+/* Transcription section */
+"Transcription" = "Transkription";
+"Backend" = "Backend";
+"Uses Apple's built-in on-device speech model. The system downloads the language assets automatically on first use. Requires macOS 26+." = "Nutzt Apples integriertes On-Device-Sprachmodell. Das System lädt die Sprachdaten beim ersten Mal automatisch herunter. Erfordert macOS 26+.";
+"Fully offline. Audio never leaves your Mac." = "Vollständig offline. Audio verlässt deinen Mac nie.";
+"Endpoint (…/v1)" = "Endpunkt (…/v1)";
+"API key (optional)" = "API-Schlüssel (optional)";
+"Model" = "Modell";
+"Language (ISO code, empty = auto)" = "Sprache (ISO-Code, leer = automatisch)";
+"Downloading" = "Lade herunter";
+"Download" = "Herunterladen";
+"Use" = "Verwenden";
+
+/* Backends */
+"Apple on-device (macOS 26+)" = "Apple On-Device (macOS 26+)";
+"Local whisper.cpp (built-in)" = "Lokales whisper.cpp (integriert)";
+"OpenAI-compatible server" = "OpenAI-kompatibler Server";
+
+/* Output section */
+"Output" = "Ausgabe";
+"Insert" = "Einfügen";
+"Type directly (keeps clipboard)" = "Direkt tippen (Zwischenablage bleibt erhalten)";
+"Paste via ⌘V" = "Einfügen per ⌘V";
+
+/* Permissions section */
+"Permissions" = "Berechtigungen";
+"Microphone" = "Mikrofon";
+"Accessibility (type at cursor)" = "Bedienungshilfen (Text am Cursor einfügen)";
+"Input Monitoring (detect key)" = "Eingabeüberwachung (Taste erkennen)";
+"Grant" = "Erlauben";
+"Re-check" = "Erneut prüfen";
+
+/* Menu bar + window */
+"Settings…" = "Einstellungen…";
+"Quit Parla" = "Parla beenden";
+"Parla Settings" = "Parla-Einstellungen";
+
+/* Recording pill */
+"Listening…" = "Höre zu…";
+"Transcribing…" = "Transkribiere…";

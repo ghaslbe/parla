@@ -21,6 +21,14 @@ mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
 cp "$BIN_DIR/Parla" "$APP/Contents/MacOS/Parla"
 cp "$ROOT/Resources/Info.plist" "$APP/Contents/Info.plist"
 
+# Localizations (en / de): Localizable.strings + InfoPlist.strings per .lproj.
+for lproj in "$ROOT/Resources/"*.lproj; do
+    [ -d "$lproj" ] || continue
+    name="$(basename "$lproj")"
+    mkdir -p "$APP/Contents/Resources/$name"
+    cp "$lproj/"* "$APP/Contents/Resources/$name/"
+done
+
 # Ad-hoc code signature. TCC (Accessibility / Input Monitoring / Mic) keys the
 # permission grant to the signature, so a stable ad-hoc signature keeps grants
 # across rebuilds on the dev machine. Replace with a Developer ID for release.

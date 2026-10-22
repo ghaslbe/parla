@@ -53,11 +53,11 @@ final class PillWindow {
     func show(_ state: State) {
         switch state {
         case .listening:
-            label.stringValue = "Listening…"
+            label.stringValue = L("Listening…")
             dot.layer?.backgroundColor = NSColor.systemRed.cgColor
             startPulse()
         case .transcribing:
-            label.stringValue = "Transcribing…"
+            label.stringValue = L("Transcribing…")
             dot.layer?.backgroundColor = NSColor.systemYellow.cgColor
             stopPulse()
         case .error(let msg):

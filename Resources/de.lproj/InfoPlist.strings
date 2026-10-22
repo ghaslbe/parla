@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Parla hört nur zu, während du die Diktiertaste hältst. Audio wird auf deinem Mac (oder deinem gewählten Server) transkribiert und nirgendwo anders hingesendet.";
+"NSSpeechRecognitionUsageDescription" = "Parla nutzt das integrierte On-Device-Sprachmodell, um dein Diktat in Text umzuwandeln. Audio bleibt auf deinem Mac.";
