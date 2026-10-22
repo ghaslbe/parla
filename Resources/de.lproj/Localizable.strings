@@ -49,3 +49,7 @@
 /* Recording pill */
 "Listening…" = "Höre zu…";
 "Transcribing…" = "Transkribiere…";
+
+/* About / disclaimer */
+"github.link" = "Auf GitHub ansehen";
+"disclaimer.body" = "Nutzung auf eigene Gefahr. Bereitgestellt „wie besehen“, ohne jegliche Gewähr.";

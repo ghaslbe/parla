@@ -1,0 +1,55 @@
+/* Trigger section */
+"Trigger" = "Activador";
+"Key" = "Tecla";
+"Hold to talk (off = press to toggle)" = "Mantén pulsado para hablar (desactivado = pulsar para alternar)";
+"Right ⌥ Option" = "⌥ Opción derecha";
+"Right ⌘ Command" = "⌘ Comando derecho";
+"Right ⌃ Control" = "⌃ Control derecho";
+"fn / 🌐 Globe" = "fn / 🌐 Globo";
+
+/* Transcription section */
+"Transcription" = "Transcripción";
+"Backend" = "Backend";
+"Uses Apple's built-in on-device speech model. The system downloads the language assets automatically on first use. Requires macOS 26+." = "Usa el modelo de voz integrado de Apple en el dispositivo. El sistema descarga los recursos de idioma automáticamente la primera vez. Requiere macOS 26+.";
+"Fully offline. Audio never leaves your Mac." = "Totalmente sin conexión. El audio nunca sale de tu Mac.";
+"Endpoint (…/v1)" = "Endpoint (…/v1)";
+"API key (optional)" = "Clave API (opcional)";
+"Model" = "Modelo";
+"Language (ISO code, empty = auto)" = "Idioma (código ISO, vacío = automático)";
+"Language" = "Idioma";
+"Automatic" = "Automático";
+"Downloading" = "Descargando";
+"Download" = "Descargar";
+"Use" = "Usar";
+
+/* Backends */
+"Apple on-device (macOS 26+)" = "Apple en el dispositivo (macOS 26+)";
+"Local whisper.cpp (built-in)" = "whisper.cpp local (integrado)";
+"OpenAI-compatible server" = "Servidor compatible con OpenAI";
+
+/* Output section */
+"Output" = "Salida";
+"Insert" = "Insertar";
+"Type directly (keeps clipboard)" = "Escribir directamente (conserva el portapapeles)";
+"Paste via ⌘V" = "Pegar con ⌘V";
+
+/* Permissions section */
+"Permissions" = "Permisos";
+"Microphone" = "Micrófono";
+"Accessibility (type at cursor)" = "Accesibilidad (escribir en el cursor)";
+"Input Monitoring (detect key)" = "Monitorización de entrada (detectar tecla)";
+"Grant" = "Conceder";
+"Re-check" = "Volver a comprobar";
+
+/* Menu bar + window */
+"Settings…" = "Ajustes…";
+"Quit Parla" = "Salir de Parla";
+"Parla Settings" = "Ajustes de Parla";
+
+/* Recording pill */
+"Listening…" = "Escuchando…";
+"Transcribing…" = "Transcribiendo…";
+
+/* About / disclaimer */
+"github.link" = "Ver en GitHub";
+"disclaimer.body" = "Uso bajo tu propia responsabilidad. Se proporciona «tal cual», sin garantía de ningún tipo.";

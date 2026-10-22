@@ -72,9 +72,17 @@ struct SettingsView: View {
                 }
                 Button("Re-check") { refreshPermissions() }
             }
+
+            Section {
+                Link(L("github.link"), destination: URL(string: "https://github.com/ghaslbe/parla")!)
+            } footer: {
+                Text(L("disclaimer.body"))
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
         }
         .formStyle(.grouped)
-        .frame(width: 440, height: 520)
+        .frame(width: 440, height: 580)
         .onAppear(perform: refreshPermissions)
         .task { await loadAppleLanguages() }
         .onChange(of: trigger) { AppSettings.shared.trigger = $0 }

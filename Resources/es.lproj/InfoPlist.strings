@@ -1,0 +1,2 @@
+"NSMicrophoneUsageDescription" = "Parla solo escucha mientras mantienes pulsada la tecla de dictado. El audio se transcribe en tu Mac (o en el servidor que elijas) y no se envía a ningún otro lugar.";
+"NSSpeechRecognitionUsageDescription" = "Parla usa el modelo de voz integrado en el dispositivo para convertir tu dictado en texto. El audio permanece en tu Mac.";

@@ -1,2 +1,4 @@
-/* English is the development language: keys are the English strings themselves,
-   so this table can stay empty — missing keys fall back to the key. */
+/* English is the development language, so UI literals fall back to their own
+   keys. These two use semantic keys, so they are defined explicitly here. */
+"github.link" = "View on GitHub";
+"disclaimer.body" = "Use at your own risk. Provided \"as is\", without warranty of any kind.";
