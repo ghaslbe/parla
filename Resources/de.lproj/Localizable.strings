@@ -16,6 +16,8 @@
 "API key (optional)" = "API-Schlüssel (optional)";
 "Model" = "Modell";
 "Language (ISO code, empty = auto)" = "Sprache (ISO-Code, leer = automatisch)";
+"Language" = "Sprache";
+"Automatic" = "Automatisch";
 "Downloading" = "Lade herunter";
 "Download" = "Herunterladen";
 "Use" = "Verwenden";

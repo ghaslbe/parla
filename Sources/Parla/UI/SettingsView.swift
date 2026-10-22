@@ -1,6 +1,7 @@
 import SwiftUI
 import AppKit
 import AVFoundation
+import Speech
 
 /// SwiftUI settings form. Reads/writes `AppSettings.shared` directly; simple and
 /// good enough while the option set is small.
@@ -20,6 +21,9 @@ struct SettingsView: View {
 
     @ObservedObject private var models = ModelManager.shared
 
+    struct Lang: Identifiable { let id: String; let name: String }
+    @State private var appleLangs: [Lang] = []
+
     var body: some View {
         Form {
             Section("Trigger") {
@@ -37,14 +41,19 @@ struct SettingsView: View {
                 case .appleSpeech:
                     Text("Uses Apple's built-in on-device speech model. The system downloads the language assets automatically on first use. Requires macOS 26+.")
                         .font(.caption).foregroundStyle(.secondary)
+                    Picker("Language", selection: $language) {
+                        Text("Automatic").tag("")
+                        ForEach(appleLangs) { Text($0.name).tag($0.id) }
+                    }
                 case .localWhisper:
                     localModelsView
+                    languageField
                 case .openAICompatible:
                     TextField("Endpoint (…/v1)", text: $endpoint)
                     SecureField("API key (optional)", text: $apiKey)
                     TextField("Model", text: $model)
+                    languageField
                 }
-                TextField("Language (ISO code, empty = auto)", text: $language)
             }
 
             Section("Output") {
@@ -67,6 +76,7 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 440, height: 520)
         .onAppear(perform: refreshPermissions)
+        .task { await loadAppleLanguages() }
         .onChange(of: trigger) { AppSettings.shared.trigger = $0 }
         .onChange(of: holdToTalk) { AppSettings.shared.holdToTalk = $0 }
         .onChange(of: insertMethod) { AppSettings.shared.insertMethod = $0 }
@@ -75,6 +85,26 @@ struct SettingsView: View {
         .onChange(of: apiKey) { AppSettings.shared.apiKey = $0 }
         .onChange(of: model) { AppSettings.shared.model = $0 }
         .onChange(of: language) { AppSettings.shared.language = $0 }
+    }
+
+    private var languageField: some View {
+        TextField("Language (ISO code, empty = auto)", text: $language)
+    }
+
+    /// Load the languages Apple's on-device model supports (deduplicated to base
+    /// language codes), so the Apple provider offers them instead of a free-text field.
+    private func loadAppleLanguages() async {
+        guard appleLangs.isEmpty, #available(macOS 26.0, *) else { return }
+        let locales = await SpeechTranscriber.supportedLocales
+        let display = Locale.current
+        var seen = Set<String>()
+        var out: [Lang] = []
+        for locale in locales {
+            guard let code = locale.language.languageCode?.identifier, !seen.contains(code) else { continue }
+            seen.insert(code)
+            out.append(Lang(id: code, name: display.localizedString(forLanguageCode: code) ?? code))
+        }
+        appleLangs = out.sorted { $0.name < $1.name }
     }
 
     @ViewBuilder private var localModelsView: some View {
