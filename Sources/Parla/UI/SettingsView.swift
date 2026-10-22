@@ -63,12 +63,19 @@ struct SettingsView: View {
             }
 
             Section("Permissions") {
-                permissionRow("Microphone", micOK) { }
+                permissionRow("Microphone", micOK) {
+                    AudioPermission.request { _ in
+                        SystemSettings.open(.microphone)
+                        refreshPermissions()
+                    }
+                }
                 permissionRow("Accessibility (type at cursor)", axOK) {
-                    TextInserter.requestAccessibility()
+                    _ = TextInserter.requestAccessibility()
+                    SystemSettings.open(.accessibility)
                 }
                 permissionRow("Input Monitoring (detect key)", inputOK) {
-                    HotkeyMonitor.requestInputMonitoring()
+                    _ = HotkeyMonitor.requestInputMonitoring()
+                    SystemSettings.open(.inputMonitoring)
                 }
                 Button("Re-check") { refreshPermissions() }
             }
@@ -165,6 +172,20 @@ struct SettingsView: View {
         axOK = TextInserter.hasAccessibility
         inputOK = HotkeyMonitor.hasInputMonitoring
         micOK = AudioPermission.granted
+    }
+}
+
+/// Opens the relevant System Settings → Privacy & Security pane.
+enum SystemSettings {
+    enum Pane: String {
+        case microphone = "Privacy_Microphone"
+        case accessibility = "Privacy_Accessibility"
+        case inputMonitoring = "Privacy_ListenEvent"
+    }
+    static func open(_ pane: Pane) {
+        if let url = URL(string: "x-apple.systempreferences:com.apple.preference.security?\(pane.rawValue)") {
+            NSWorkspace.shared.open(url)
+        }
     }
 }
 

@@ -29,13 +29,23 @@ for lproj in "$ROOT/Resources/"*.lproj; do
     cp "$lproj/"* "$APP/Contents/Resources/$name/"
 done
 
-# Ad-hoc code signature. TCC (Accessibility / Input Monitoring / Mic) keys the
-# permission grant to the signature, so a stable ad-hoc signature keeps grants
-# across rebuilds on the dev machine. Replace with a Developer ID for release.
-echo "==> codesign (ad-hoc)"
-codesign --force --deep --sign - \
-    --options runtime \
-    --identifier dev.parla.Parla \
-    "$APP" >/dev/null 2>&1 || codesign --force --deep --sign - "$APP"
+# Code signature. TCC (Accessibility / Input Monitoring / Microphone) keys each
+# permission grant to the app's code identity. An ad-hoc signature's identity
+# (cdhash) changes on every rebuild, so grants go stale and must be re-added
+# each time. Signing with a real, stable identity keeps grants across rebuilds.
+#
+# Picks, in order: $PARLA_SIGN_ID, else the first codesigning identity in the
+# keychain (e.g. "Apple Development: …"), else ad-hoc.
+SIGN_ID="${PARLA_SIGN_ID:-}"
+if [ -z "$SIGN_ID" ]; then
+    SIGN_ID="$(security find-identity -v -p codesigning 2>/dev/null | awk '/[0-9]+\)/{print $2; exit}')"
+fi
+if [ -n "$SIGN_ID" ]; then
+    echo "==> codesign with identity $SIGN_ID"
+    codesign --force --deep --sign "$SIGN_ID" --identifier dev.parla.Parla "$APP"
+else
+    echo "==> codesign (ad-hoc — grants will reset on each rebuild)"
+    codesign --force --deep --sign - --identifier dev.parla.Parla "$APP"
+fi
 
 echo "==> done: $APP"
