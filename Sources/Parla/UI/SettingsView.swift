@@ -24,6 +24,9 @@ struct SettingsView: View {
     struct Lang: Identifiable { let id: String; let name: String }
     @State private var appleLangs: [Lang] = []
 
+    // Permission state can change in System Settings while we're open, so poll it.
+    private let permTicker = Timer.publish(every: 1.5, on: .main, in: .common).autoconnect()
+
     var body: some View {
         Form {
             Section("Trigger") {
@@ -91,6 +94,7 @@ struct SettingsView: View {
         .formStyle(.grouped)
         .frame(width: 440, height: 580)
         .onAppear(perform: refreshPermissions)
+        .onReceive(permTicker) { _ in refreshPermissions() }
         .task { await loadAppleLanguages() }
         .onChange(of: trigger) { AppSettings.shared.trigger = $0 }
         .onChange(of: holdToTalk) { AppSettings.shared.holdToTalk = $0 }
